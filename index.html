@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>マイ銘柄ソートリスト</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+</head>
+<body>
+<!-- ===== Login Screen ===== -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <h1>📊 マイ銘柄ソートリスト</h1>
+    <p>銘柄コードを整理・管理する個人投資家のためのツール</p>
+    <button id="loginBtn" class="google-login-btn">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Googleアカウントでログイン
+    </button>
+  </div>
+</div>
+
+<!-- ===== Main App ===== -->
+<div id="app" class="app" style="display:none">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <span class="logo">📊</span>
+      <span class="app-title">マイ銘柄ソートリスト</span>
+    </div>
+    <div class="header-right">
+      <span id="userName" class="user-name"></span>
+      <button id="adminBtn" class="header-btn" title="管理">⚙️</button>
+      <button id="logoutBtn" class="header-btn" title="ログアウト">🚪</button>
+    </div>
+  </header>
+
+  <!-- Tab Bar -->
+  <nav class="tab-bar" id="tabBar">
+    <button class="tab active" data-tab="dashboard">📋 ダッシュボード</button>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent">
+    <!-- Dashboard View -->
+    <div id="dashboardView" class="view">
+      <div class="dashboard-header">
+        <h2>ダッシュボード</h2>
+        <div class="dashboard-actions">
+          <button id="helpBtn" class="action-btn" title="使い方ガイド">❓ ヘルプ</button>
+          <button id="dashEditToggle" class="action-btn">✏️ 編集</button>
+        </div>
+      </div>
+      <div id="dashboardGrid" class="dashboard-grid"></div>
+    </div>
+
+    <!-- Tab Page View -->
+    <div id="tabPageView" class="view" style="display:none">
+      <div class="tab-page-header">
+        <div class="tab-page-title-row">
+          <input id="tabNameInput" class="tab-name-input" placeholder="タブ名を入力..." readonly>
+          <div class="tab-page-actions">
+            <button id="tabEditToggle" class="action-btn">✏️ 編集モード</button>
+          </div>
+        </div>
+        <!-- Bulk Input Area (edit mode only) -->
+        <div id="bulkArea" class="bulk-area" style="display:none">
+          <div class="bulk-row">
+            <label>一括入力：</label>
+            <input id="bulkInput" class="bulk-input" placeholder="コードをカンマ/スペース区切りで入力（例：7203,9432 8058）">
+            <button id="bulkAddBtn" class="bulk-btn add">追加</button>
+          </div>
+          <div class="bulk-row">
+            <label>一括吐出：</label>
+            <input id="bulkOutput" class="bulk-output" readonly>
+            <button id="bulkExportBtn" class="bulk-btn export">吐き出し</button>
+            <button id="bulkCopyBtn" class="bulk-btn copy">📋</button>
+          </div>
+          <div class="bulk-row">
+            <label>セクション：</label>
+            <input id="sectionInput" class="bulk-input" placeholder="セクション名（例：半導体）">
+            <button id="addSectionBtn" class="bulk-btn section">挿入</button>
+            <button id="resetBtn" class="bulk-btn reset">🗑️ 全リセット</button>
+          </div>
+        </div>
+      </div>
+      <!-- Stock Grid -->
+      <div id="stockGrid" class="stock-grid"></div>
+      <div id="stockCount" class="stock-count"></div>
+    </div>
+  </main>
+</div>
+
+<!-- ===== Help Modal ===== -->
+<div class="modal-overlay" id="helpModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>📖 使い方ガイド</h2>
+      <button class="modal-close" onclick="document.getElementById('helpModal').classList.remove('show')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="help-section">
+        <h3>🔰 概要</h3>
+        <p>銘柄コードを最大30タブで分類・管理できるツールです。Googleアカウントでログインすれば、PC・スマホ・タブレットどこからでも同じデータにアクセスできます。</p>
+      </div>
+      <div class="help-section">
+        <h3>📋 ダッシュボード</h3>
+        <p>全30タブの一覧です。タブ名をクリックするとそのページに移動します。編集モードでタブ名の変更や順序の入れ替え（ドラッグ＆ドロップ/上下ボタン）ができます。</p>
+      </div>
+      <div class="help-section">
+        <h3>📝 各タブページ</h3>
+        <p><b>表示モード：</b>銘柄コードと銘柄名が5列で一覧表示されます。銘柄コードリンカー拡張機能と併用すれば、ホバーで22サイトへ即アクセス可能です。<br>
+        <b>編集モード：</b>銘柄の追加・削除・並び替えができます。一括入力欄にカンマ/スペース区切りでコードを入力し「追加」で一気に登録できます。</p>
+      </div>
+      <div class="help-section">
+        <h3>📂 セクション分け</h3>
+        <p>編集モードでセクション名を入力して「挿入」すると、---半導体--- のような見出しを銘柄リストの途中に挿入できます。銘柄の分類整理に便利です。</p>
+      </div>
+      <div class="help-section">
+        <h3>💾 データの保存</h3>
+        <p>変更は自動的にクラウドに保存されます。手動保存は不要です。</p>
+      </div>
+      <div class="help-section">
+        <h3>⚙️ 管理画面</h3>
+        <p>ヘッダーの⚙️ボタンから、JPX銘柄マスタの更新や指数構成銘柄の更新ができます。<br>
+        <b>JPXマスタ更新：</b><a href="https://www.jpx.co.jp/markets/statistics-equities/misc/01.html" target="_blank">JPX公式サイト</a>からExcelファイル(data_j.xls)をダウンロードし、CSV変換してアップロードしてください。</p>
+      </div>
+      <div class="help-section">
+        <h3>🔗 銘柄コードリンカーとの連携</h3>
+        <p>Chrome拡張機能「銘柄コードリンカー」をインストールすれば、表示されている全ての銘柄コードが自動でリンク化され、株探・TradingView等22サイトへワンクリックで遷移できます。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Admin Modal ===== -->
+<div class="modal-overlay" id="adminModal">
+  <div class="modal wide">
+    <div class="modal-header">
+      <h2>⚙️ 管理画面</h2>
+      <button class="modal-close" onclick="document.getElementById('adminModal').classList.remove('show')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="admin-section">
+        <h3>📄 JPX銘柄マスタ更新</h3>
+        <p>現在の登録銘柄数：<span id="masterCount">0</span>件</p>
+        <p><a href="https://www.jpx.co.jp/markets/statistics-equities/misc/01.html" target="_blank">JPX公式サイト</a>からdata_j.xlsをダウンロード → CSV変換 → 下記にアップロード</p>
+        <p>CSV形式：<code>コード,銘柄名</code>（1行目ヘッダー可、自動判別）</p>
+        <input type="file" id="masterFileInput" accept=".csv,.txt">
+        <button id="masterUploadBtn" class="admin-btn">マスタ更新</button>
+        <div id="masterStatus" class="admin-status"></div>
+      </div>
+      <div class="admin-section">
+        <h3>📊 指数構成銘柄の更新</h3>
+        <p>各指数の構成銘柄をCSV（コードのみ、1列）でアップロードできます。</p>
+        <div class="index-upload-grid">
+          <div class="index-upload-item">
+            <label>日経225：</label>
+            <input type="file" class="index-file" data-index="nikkei225" accept=".csv,.txt">
+          </div>
+          <div class="index-upload-item">
+            <label>TOPIX100：</label>
+            <input type="file" class="index-file" data-index="topix100" accept=".csv,.txt">
+          </div>
+          <div class="index-upload-item">
+            <label>JPX400：</label>
+            <input type="file" class="index-file" data-index="jpx400" accept=".csv,.txt">
+          </div>
+          <div class="index-upload-item">
+            <label>JPX150：</label>
+            <input type="file" class="index-file" data-index="jpx150" accept=".csv,.txt">
+          </div>
+          <div class="index-upload-item">
+            <label>グロース250：</label>
+            <input type="file" class="index-file" data-index="growth250" accept=".csv,.txt">
+          </div>
+        </div>
+        <button id="indexUploadBtn" class="admin-btn">指数銘柄を更新＆タブ18-20に反映</button>
+        <div id="indexStatus" class="admin-status"></div>
+      </div>
+      <div class="admin-section">
+        <h3>🔄 番台タブ再生成（21-30）</h3>
+        <p>JPXマスタを元にタブ21〜30を再生成します（Aコードはタブ30に集約）。</p>
+        <button id="regenRangeBtn" class="admin-btn">番台タブ再生成</button>
+        <div id="rangeStatus" class="admin-status"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<!-- App Scripts -->
+<script src="stock-data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
