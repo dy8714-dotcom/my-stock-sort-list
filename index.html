@@ -8,7 +8,7 @@
 </head>
 <body>
 
-  <!-- ============ ログイン画面 ============ -->
+  <!-- ログイン画面 -->
   <div id="login-screen">
     <h1>📊 マイ銘柄ソートリスト</h1>
     <p>Googleアカウントでログインして、銘柄管理を始めましょう</p>
@@ -19,21 +19,20 @@
     <p id="login-status" style="color:var(--danger);font-size:12px;"></p>
   </div>
 
-  <!-- ============ メインアプリ ============ -->
+  <!-- メインアプリ -->
   <div id="app-container" class="hidden">
-    <!-- ダッシュボード -->
     <div id="dashboard">
       <div class="left-section">
         <span class="app-title">📊 マイ銘柄ソートリスト</span>
       </div>
       <div class="right-section">
-        <button class="btn" id="btn-export-codes" title="チェック済み銘柄コードを出力">📋 コード出力</button>
-        <button class="btn" id="btn-move-up" title="選択銘柄を上へ移動">↑</button>
-        <button class="btn" id="btn-move-down" title="選択銘柄を下へ移動">↓</button>
-        <button class="btn btn-danger" id="btn-delete-checked" title="チェック済み銘柄を削除">🗑 選択削除</button>
+        <button class="btn" id="btn-export-codes" title="チェック済みコード出力">📋 コード出力</button>
+        <button class="btn" id="btn-move-up" title="選択銘柄を上へ">↑</button>
+        <button class="btn" id="btn-move-down" title="選択銘柄を下へ">↓</button>
+        <button class="btn btn-danger" id="btn-delete-checked" title="チェック済み削除">🗑 選択削除</button>
         <div class="toolbar-separator"></div>
-        <button class="btn" id="btn-admin" title="管理画面">⚙ 管理</button>
-        <button class="btn" id="btn-help" title="ヘルプ">？</button>
+        <button class="btn" id="btn-admin">⚙ 管理</button>
+        <button class="btn" id="btn-help">？</button>
         <div class="toolbar-separator"></div>
         <span class="user-info">
           <img id="user-avatar" src="" alt="">
@@ -43,17 +42,12 @@
       </div>
     </div>
 
-    <!-- ツールバー -->
     <div id="toolbar">
       <div class="toolbar-group">
         <label>入力列:</label>
         <select id="input-column-select">
-          <option value="0">列1</option>
-          <option value="1">列2</option>
-          <option value="2">列3</option>
-          <option value="3">列4</option>
-          <option value="4">列5</option>
-          <option value="5">列6</option>
+          <option value="0">列1</option><option value="1">列2</option><option value="2">列3</option>
+          <option value="3">列4</option><option value="4">列5</option><option value="5">列6</option>
         </select>
       </div>
       <div class="toolbar-separator"></div>
@@ -80,91 +74,71 @@
       </div>
     </div>
 
-    <!-- タブバー -->
     <div id="tab-bar"></div>
-
-    <!-- メインコンテンツ -->
     <div id="main-content">
       <div id="stock-grid"></div>
     </div>
   </div>
 
-  <!-- ============ ヘルプモーダル ============ -->
+  <!-- ヘルプモーダル -->
   <div id="help-modal" class="modal-overlay hidden">
     <div class="modal">
       <button class="close-btn" onclick="document.getElementById('help-modal').classList.add('hidden')">&times;</button>
-      <h2>？ ヘルプ — マイ銘柄ソートリスト</h2>
+      <h2>？ ヘルプ</h2>
       <h3>基本操作</h3>
       <ul>
-        <li><strong>タブ:</strong> 30個のタブで銘柄を分類管理。タブ1-17は白紙、18-20はインデックス、21-30は番台別。</li>
-        <li><strong>タブ名変更:</strong> ツールバーの「タブ名」欄に入力して「変更」ボタン。またはタブをダブルクリック。</li>
-        <li><strong>銘柄追加:</strong> コード入力欄に銘柄コードを入力して「追加」。選択した列に追加されます。</li>
-        <li><strong>列選択:</strong> ツールバーの「入力列」で、追加先の列（1-6）を選択できます。</li>
-        <li><strong>コード直接編集:</strong> 銘柄コード部分をクリックすると直接編集できます。</li>
+        <li><b>タブ1-17:</b> 自由に銘柄を管理（各列50行×6列=300銘柄）</li>
+        <li><b>タブ18:</b> JPX150構成銘柄（プリセット）</li>
+        <li><b>タブ19:</b> JPX400構成銘柄（プリセット）</li>
+        <li><b>タブ20:</b> 日経225＋TOPIX100（重複除外、プリセット）</li>
+        <li><b>タブ21-29:</b> 1000〜9000番台（全銘柄、昇順）</li>
+        <li><b>タブ30:</b> 3桁＋Aコード</li>
       </ul>
-      <h3>ドラッグ＆ドロップ</h3>
+      <h3>銘柄操作</h3>
       <ul>
-        <li>銘柄をドラッグして、同じ列・別の列・別セクションに移動可能。</li>
-        <li>セクションヘッダもドラッグで移動可能。</li>
-        <li>列をまたいだ移動にも対応。</li>
-      </ul>
-      <h3>チェックボックス</h3>
-      <ul>
-        <li>各銘柄の右端にチェックボックスがあります。</li>
-        <li>各列ヘッダの「全選択」で列内の全銘柄を一括選択/解除。</li>
-        <li><strong>コード出力:</strong> チェック済み銘柄のコードのみ出力。</li>
-        <li><strong>選択削除:</strong> チェック済み銘柄のみ削除。</li>
-      </ul>
-      <h3>↑↓移動</h3>
-      <ul>
-        <li>チェック済みの銘柄を上下に移動するボタンがダッシュボードにあります。</li>
-      </ul>
-      <h3>重複銘柄</h3>
-      <ul>
-        <li>同一タブ内に重複コードがある場合、銘柄名がピンク色で表示されます。</li>
+        <li><b>追加:</b> ツールバーでコード入力→追加。入力列を選択可能。</li>
+        <li><b>コード直接編集:</b> コード部分をクリック。</li>
+        <li><b>ドラッグ＆ドロップ:</b> 銘柄・セクションを列間で自由に移動。</li>
+        <li><b>↑↓ボタン:</b> チェック済み銘柄を上下移動。</li>
+        <li><b>チェックボックス:</b> 列ヘッダの全選択、コード出力、選択削除に対応。</li>
+        <li><b>重複表示:</b> 同タブ内の重複銘柄はピンク色で表示。</li>
       </ul>
       <h3>管理画面</h3>
       <ul>
-        <li><strong>JPXマスタ:</strong> JPX公式 data_j.xls をアップロードして全銘柄マスタを更新。</li>
-        <li><strong>指数CSV:</strong> 日経225、TOPIX100等の構成銘柄CSVを更新。</li>
-        <li><strong>番台再生成:</strong> マスタからタブ21-30を再生成。</li>
+        <li><b>JPXマスタ:</b> data_j.xlsアップロードで全銘柄更新。</li>
+        <li><b>番台再生成:</b> マスタから21-30タブを再生成。</li>
+        <li><b>プリセット初期化:</b> タブ18-20を初期データに戻す。</li>
       </ul>
-      <h3>Chrome拡張「銘柄コードリンカー」</h3>
+      <h3>データ保存</h3>
       <ul>
-        <li>銘柄コードにホバーすると22サイトへ即アクセス可能（別途インストール済み）。</li>
+        <li>データはブラウザ(localStorage)に自動保存されます。</li>
+        <li>Googleログイン中はFirestoreにも同期されます。</li>
       </ul>
     </div>
   </div>
 
-  <!-- ============ 管理画面モーダル ============ -->
+  <!-- 管理画面モーダル -->
   <div id="admin-modal" class="modal-overlay hidden">
     <div class="modal" style="max-width:800px;">
       <button class="close-btn" onclick="document.getElementById('admin-modal').classList.add('hidden')">&times;</button>
       <h2>⚙ 管理画面</h2>
 
-      <!-- JPXマスタアップロード -->
       <div class="admin-section">
         <h3>📥 JPXマスタ（data_j.xls アップロード）</h3>
         <p style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">
-          JPX公式サイトから data_j.xls をダウンロードし、ここにアップロードしてください。<br>
-          銘柄マスタが自動更新され、番台タブ（21-30）も再生成されます。
+          JPX公式の data_j.xls をアップロードすると銘柄マスタが更新され、番台タブ（21-30）も再生成されます。
         </p>
         <div class="file-upload-area" id="xls-upload-area">
-          <p>📁 data_j.xls をドラッグ＆ドロップ<br>またはクリックしてファイルを選択</p>
+          <p>📁 data_j.xls をドラッグ＆ドロップ<br>またはクリック</p>
           <input type="file" id="xls-file-input" accept=".xls,.xlsx,.xlsm">
         </div>
         <div id="xls-upload-status"></div>
-        <div style="margin-top:8px;">
-          <span style="font-size:12px;color:var(--text-dim);" id="master-count-display">現在のマスタ: 0銘柄</span>
-        </div>
+        <span style="font-size:12px;color:var(--text-dim);" id="master-count-display">現在のマスタ: 0銘柄</span>
       </div>
 
-      <!-- 指数CSV更新 -->
       <div class="admin-section">
         <h3>📊 指数構成銘柄CSV更新</h3>
-        <p style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">
-          指数ごとの構成銘柄CSVをアップロードして更新。各行に銘柄コードを1つずつ記載。
-        </p>
+        <p style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">指数の構成銘柄CSV（1行1コード）をアップロード。</p>
         <div class="toolbar-group" style="margin-bottom:8px;">
           <label>対象指数:</label>
           <select id="index-csv-target" style="padding:4px 8px;background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:3px;">
@@ -172,37 +146,30 @@
             <option value="topix100">TOPIX100</option>
             <option value="jpx150">JPX150</option>
             <option value="jpx400">JPX400</option>
-            <option value="growth250">グロース250</option>
           </select>
         </div>
         <div class="file-upload-area" id="csv-upload-area">
-          <p>📁 CSVファイルをドラッグ＆ドロップ<br>またはクリックしてファイルを選択</p>
+          <p>📁 CSVファイルをドラッグ＆ドロップ<br>またはクリック</p>
           <input type="file" id="csv-file-input" accept=".csv,.txt">
         </div>
         <div id="csv-upload-status"></div>
       </div>
 
-      <!-- 番台タブ再生成 -->
       <div class="admin-section">
         <h3>🔄 番台タブ再生成</h3>
-        <p style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">
-          現在のマスタデータからタブ21-30を再生成します。既存の番台データは上書きされます。
-        </p>
+        <p style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">マスタデータからタブ21-30を再生成（既存データは上書き）。</p>
         <button class="btn btn-accent" id="btn-regen-bandai">番台タブを再生成</button>
       </div>
 
-      <!-- プリセット初期化 -->
       <div class="admin-section">
         <h3>🏗 プリセットタブ初期化</h3>
-        <p style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">
-          タブ18-20のインデックスデータを初期プリセットに戻します。
-        </p>
+        <p style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">タブ18-20を初期データに戻します。</p>
         <button class="btn" id="btn-reset-presets">プリセットを初期化</button>
       </div>
     </div>
   </div>
 
-  <!-- ============ コード出力モーダル ============ -->
+  <!-- コード出力モーダル -->
   <div id="export-modal" class="modal-overlay hidden">
     <div class="modal" style="max-width:500px;">
       <button class="close-btn" onclick="document.getElementById('export-modal').classList.add('hidden')">&times;</button>
@@ -215,18 +182,12 @@
     </div>
   </div>
 
-  <!-- ============ トースト通知 ============ -->
   <div id="toast-container"></div>
 
-  <!-- ============ Firebase SDK ============ -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
-  <!-- SheetJS for XLS reading -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-  <!-- App scripts -->
   <script src="stock-data.js"></script>
   <script src="app.js"></script>
 </body>
