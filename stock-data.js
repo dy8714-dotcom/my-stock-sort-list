@@ -4493,22 +4493,18 @@ function generatePresetTabs(colCount, customMaster) {
   const tabs = {};
   const names = {};
 
-  const jpx150set = new Set(INDEX_JPX150);
-  const topixOnly18 = INDEX_TOPIX100.filter(c => !jpx150set.has(c));
   tabs[18] = _buildSections([
     { label: "JPX150", codes: INDEX_JPX150 },
-    { label: "TOPIX100（JPX150除く）", codes: topixOnly18 }
+    { label: "TOPIX100", codes: INDEX_TOPIX100 }
   ], master, colCount);
   names[18] = "JPX150＆TOPIX100";
 
   tabs[19] = _buildSections([{ label: "JPX400", codes: INDEX_JPX400 }], master, colCount);
   names[19] = "JPX400";
 
-  const n225set = new Set(INDEX_NIKKEI225);
-  const topixOnly20 = INDEX_TOPIX100.filter(c => !n225set.has(c));
   tabs[20] = _buildSections([
     { label: "日経225", codes: INDEX_NIKKEI225 },
-    { label: "TOPIX100（日経225除く）", codes: topixOnly20 }
+    { label: "TOPIX100", codes: INDEX_TOPIX100 }
   ], master, colCount);
   names[20] = "日経225＆TOPIX100";
 
