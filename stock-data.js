@@ -4452,6 +4452,9 @@ const INDEX_TOPIX100 = ["1605", "1721", "1801", "1802", "1803", "1812", "1878", 
 const INDEX_JPX400 = [...new Set([...INDEX_NIKKEI225, ...INDEX_TOPIX100])];
 const INDEX_JPX150 = INDEX_NIKKEI225.slice(0, 150);
 
+// グロース250（構成銘柄はCSVアップロードで更新してください）
+const INDEX_GROWTH250 = [];
+
 
 function getBandai(code) {
   if (!code) return null;
@@ -4495,9 +4498,9 @@ function generatePresetTabs(colCount, customMaster) {
 
   tabs[18] = _buildSections([
     { label: "JPX150", codes: INDEX_JPX150 },
-    { label: "TOPIX100", codes: INDEX_TOPIX100 }
+    { label: "グロース250", codes: INDEX_GROWTH250 }
   ], master, colCount);
-  names[18] = "JPX150＆TOPIX100";
+  names[18] = "JPX150＆グロース250";
 
   tabs[19] = _buildSections([{ label: "JPX400", codes: INDEX_JPX400 }], master, colCount);
   names[19] = "JPX400";
@@ -4522,7 +4525,10 @@ function generatePresetTabs(colCount, customMaster) {
 function _buildSections(sections, master, colCount) {
   const result = [];
   for (const sec of sections) {
-    result.push({ type: "section", label: sec.label, _col: 0 });
+    // セクションヘッダを全列に追加（どの列を見てもセクションが分かるように）
+    for (let c = 0; c < colCount; c++) {
+      result.push({ type: "section", label: sec.label, _col: c });
+    }
     const items = sec.codes.filter(c => master[c]).map(c => ({ code: c, name: master[c] }));
     result.push(..._assignCols(items, colCount));
   }
