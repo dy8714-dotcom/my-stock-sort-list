@@ -69,18 +69,15 @@ html, body {
 
 /* ============ タブバー ============ */
 #tab-bar {
-  display: flex; background: var(--bg-panel);
+  display: flex; flex-wrap: wrap; background: var(--bg-panel);
   border-bottom: 2px solid var(--border);
-  overflow-x: auto; overflow-y: hidden;
-  scrollbar-width: thin; scrollbar-color: var(--accent-dim) transparent;
   flex-shrink: 0;
 }
-#tab-bar::-webkit-scrollbar { height: 4px; }
-#tab-bar::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 2px; }
 .tab-item {
-  padding: 6px 14px; font-size: var(--font-size-sm); color: var(--text-dim);
+  padding: 5px 0; font-size: var(--font-size-sm); color: var(--text-dim);
   cursor: pointer; border-bottom: 2px solid transparent;
   white-space: nowrap; transition: all 0.15s; user-select: none;
+  width: calc(100% / 15); text-align: center; box-sizing: border-box;
 }
 .tab-item:hover { color: var(--text); background: var(--bg-hover); }
 .tab-item.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }

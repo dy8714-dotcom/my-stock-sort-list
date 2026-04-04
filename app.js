@@ -22,7 +22,7 @@ document.getElementById('btn-logout').addEventListener('click',()=>auth.signOut(
 auth.onAuthStateChanged(async(user)=>{if(user){APP.uid=user.uid;document.getElementById('login-screen').style.display='none';document.getElementById('app-container').classList.remove('hidden');document.getElementById('user-name').textContent=user.displayName||user.email;if(user.photoURL)document.getElementById('user-avatar').src=user.photoURL;await loadAllData();renderTabs();switchTab(APP.currentTab);}else{APP.uid=null;document.getElementById('login-screen').style.display='flex';document.getElementById('app-container').classList.add('hidden');}});
 
 // === データ読み込み ===
-function getDefaultTabNames(){const n={};for(let i=1;i<=17;i++)n[i]='';n[18]='JPX150＆グロース250';n[19]='JPX400';n[20]='日経225＆TOPIX100';for(let b=1;b<=9;b++)n[20+b]=b+'000番台';n[30]='3桁＋Aコード';return n;}
+function getDefaultTabNames(){const n={};for(let i=1;i<=15;i++)n[i]='';n[16]='グロース250';n[17]='TOPIX100';n[18]='JPX150';n[19]='JPX400';n[20]='日経225';for(let b=1;b<=9;b++)n[20+b]=b+'000番台';n[30]='3桁＋Aコード';return n;}
 
 async function loadAllData(){
   if(!APP.uid)return;
@@ -52,7 +52,7 @@ async function loadAllData(){
     snap.forEach(doc=>{
       const id=parseInt(doc.id);const s=doc.data().stocks;
       // タブ1-17のみFirestoreから読み込み
-      if(id>=1&&id<=17&&s&&s.length>0){
+      if(id>=1&&id<=15&&s&&s.length>0){
         APP.tabs[id]=s.map(item=>{if(item.type==='section')return item;return{...item,name:resolveName(item.code)};});
       }
     });
@@ -70,7 +70,7 @@ async function loadAllData(){
 
 let saveTimer=null;
 function saveTabData(tabId){
-  if(!APP.uid||tabId>=18)return; // タブ18-30は自動生成なので保存不要
+  if(!APP.uid||tabId>=16)return; // タブ18-30は自動生成なので保存不要
   clearTimeout(saveTimer);
   saveTimer=setTimeout(()=>{
     db.collection('users').doc(APP.uid).collection('tabs').doc(String(tabId))
