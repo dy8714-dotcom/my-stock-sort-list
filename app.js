@@ -31,7 +31,7 @@ async function loadAllData(){
 
   // ★ タブ18-30: 常にstock-data.jsから生成（古いFirestoreデータは無視）
   const preset=generatePresetTabs(APP.COL_COUNT,APP.customMaster);
-  for(let t=18;t<=30;t++){
+  for(let t=16;t<=30;t++){
     APP.tabs[t]=preset.tabs[t]||[];
     APP.tabNames[t]=preset.names[t];
   }
@@ -45,7 +45,7 @@ async function loadAllData(){
       if(d.customMaster){APP.customMaster=d.customMaster;
         // カスタムマスタがある場合、プリセットを再生成
         const p2=generatePresetTabs(APP.COL_COUNT,d.customMaster);
-        for(let t=18;t<=30;t++){APP.tabs[t]=p2.tabs[t]||[];APP.tabNames[t]=p2.names[t];}
+        for(let t=16;t<=30;t++){APP.tabs[t]=p2.tabs[t]||[];APP.tabNames[t]=p2.names[t];}
       }
     }
     const snap=await db.collection('users').doc(APP.uid).collection('tabs').get();
@@ -59,7 +59,7 @@ async function loadAllData(){
   }catch(err){console.warn('Firestore:',err.message);}
 
   // タブ18-30をFirestoreにも保存（バックグラウンド、エラーは無視）
-  for(let t=18;t<=30;t++){
+  for(let t=16;t<=30;t++){
     db.collection('users').doc(APP.uid).collection('tabs').doc(String(t))
       .set({stocks:compactForSave(APP.tabs[t])}).catch(()=>{});
   }
@@ -116,11 +116,106 @@ function moveChecked(dir){if(!APP.checkedItems.size){showToast('チェックな�
 document.getElementById('btn-admin').addEventListener('click',()=>{document.getElementById('admin-modal').classList.remove('hidden');updateMasterCountDisplay();});
 document.getElementById('btn-help').addEventListener('click',()=>{document.getElementById('help-modal').classList.remove('hidden');});
 const xlsA=document.getElementById('xls-upload-area'),xlsI=document.getElementById('xls-file-input');xlsA.addEventListener('click',()=>xlsI.click());xlsA.addEventListener('dragover',e=>{e.preventDefault();xlsA.classList.add('drag-active');});xlsA.addEventListener('dragleave',()=>xlsA.classList.remove('drag-active'));xlsA.addEventListener('drop',e=>{e.preventDefault();xlsA.classList.remove('drag-active');if(e.dataTransfer.files.length)processXls(e.dataTransfer.files[0]);});xlsI.addEventListener('change',()=>{if(xlsI.files.length)processXls(xlsI.files[0]);});
-async function processXls(file){const st=document.getElementById('xls-upload-status');st.innerHTML='<div class="status-msg" style="color:var(--accent);border:1px solid var(--accent);background:rgba(0,180,216,0.1)">⏳ 読み込み中...</div>';try{const data=await file.arrayBuffer();const wb=XLSX.read(data,{type:'array'});const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1});let cc=-1,nc=-1;for(let r=0;r<Math.min(5,json.length);r++){const row=json[r];if(!row)continue;for(let c=0;c<row.length;c++){const v=String(row[c]||'').trim();if(/コード|Code/i.test(v))cc=c;if(/銘柄名|銘柄|会社名|Name/i.test(v))nc=c;}if(cc>=0)break;}if(cc<0){for(let r=1;r<Math.min(10,json.length);r++){const row=json[r];if(!row)continue;for(let c=0;c<row.length;c++){if(String(row[c]||'').trim().length>=3){cc=c;nc=c+1;break;}}if(cc>=0)break;}}if(cc<0){st.innerHTML='<div class="status-msg error">❌ コード列を検出できません</div>';return;}const master={};for(let r=1;r<json.length;r++){const row=json[r];if(!row)continue;let code=String(row[cc]||'').trim(),name=String(row[nc]||'').trim().replace(/\u3000/g,' ');if(code&&name)master[code]=name;}const cnt=Object.keys(master).length;if(!cnt){st.innerHTML='<div class="status-msg error">❌ データなし</div>';return;}APP.customMaster=master;const preset=generatePresetTabs(APP.COL_COUNT,master);for(let t=18;t<=30;t++){APP.tabs[t]=preset.tabs[t]||[];APP.tabNames[t]=preset.names[t];}try{await db.collection('users').doc(APP.uid).set({customMaster:master,tabNames:APP.tabNames},{merge:true});}catch(e){console.warn('マスタ保存:',e.message);}st.innerHTML='<div class="status-msg success">✅ '+cnt+'銘柄インポート完了！</div>';updateMasterCountDisplay();renderTabs();if(APP.currentTab>=18)renderGrid();showToast(cnt+'銘柄インポート','success');}catch(e){st.innerHTML='<div class="status-msg error">❌ '+e.message+'</div>';}}
+async function processXls(file){const st=document.getElementById('xls-upload-status');st.innerHTML='<div class="status-msg" style="color:var(--accent);border:1px solid var(--accent);background:rgba(0,180,216,0.1)">⏳ 読み込み中...</div>';try{const data=await file.arrayBuffer();const wb=XLSX.read(data,{type:'array'});const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1});let cc=-1,nc=-1;for(let r=0;r<Math.min(5,json.length);r++){const row=json[r];if(!row)continue;for(let c=0;c<row.length;c++){const v=String(row[c]||'').trim();if(/コード|Code/i.test(v))cc=c;if(/銘柄名|銘柄|会社名|Name/i.test(v))nc=c;}if(cc>=0)break;}if(cc<0){for(let r=1;r<Math.min(10,json.length);r++){const row=json[r];if(!row)continue;for(let c=0;c<row.length;c++){if(String(row[c]||'').trim().length>=3){cc=c;nc=c+1;break;}}if(cc>=0)break;}}if(cc<0){st.innerHTML='<div class="status-msg error">❌ コード列を検出できません</div>';return;}const master={};for(let r=1;r<json.length;r++){const row=json[r];if(!row)continue;let code=String(row[cc]||'').trim(),name=String(row[nc]||'').trim().replace(/\u3000/g,' ');if(code&&name)master[code]=name;}const cnt=Object.keys(master).length;if(!cnt){st.innerHTML='<div class="status-msg error">❌ データなし</div>';return;}APP.customMaster=master;const preset=generatePresetTabs(APP.COL_COUNT,master);for(let t=16;t<=30;t++){APP.tabs[t]=preset.tabs[t]||[];APP.tabNames[t]=preset.names[t];}try{await db.collection('users').doc(APP.uid).set({customMaster:master,tabNames:APP.tabNames},{merge:true});}catch(e){console.warn('マスタ保存:',e.message);}st.innerHTML='<div class="status-msg success">✅ '+cnt+'銘柄インポート完了！</div>';updateMasterCountDisplay();renderTabs();if(APP.currentTab>=16)renderGrid();showToast(cnt+'銘柄インポート','success');}catch(e){st.innerHTML='<div class="status-msg error">❌ '+e.message+'</div>';}}
 const csvA=document.getElementById('csv-upload-area'),csvI=document.getElementById('csv-file-input');csvA.addEventListener('click',()=>csvI.click());csvA.addEventListener('dragover',e=>{e.preventDefault();csvA.classList.add('drag-active');});csvA.addEventListener('dragleave',()=>csvA.classList.remove('drag-active'));csvA.addEventListener('drop',e=>{e.preventDefault();csvA.classList.remove('drag-active');if(e.dataTransfer.files.length)processCsv(e.dataTransfer.files[0]);});csvI.addEventListener('change',()=>{if(csvI.files.length)processCsv(csvI.files[0]);});
 async function processCsv(file){const st=document.getElementById('csv-upload-status');try{const t=await file.text();const codes=t.split(/[\r\n,\t;]+/).map(s=>s.trim().replace(/"/g,'')).filter(c=>c.length>=3);st.innerHTML=codes.length?'<div class="status-msg success">✅ '+codes.length+'銘柄読み込み</div>':'<div class="status-msg error">❌ 有効なコードなし</div>';}catch(e){st.innerHTML='<div class="status-msg error">❌ '+e.message+'</div>';}}
-document.getElementById('btn-regen-bandai').addEventListener('click',()=>{const preset=generatePresetTabs(APP.COL_COUNT,APP.customMaster);for(let t=18;t<=30;t++){APP.tabs[t]=preset.tabs[t]||[];APP.tabNames[t]=preset.names[t];}renderTabs();if(APP.currentTab>=18)renderGrid();showToast('番台タブ再生成完了','success');});
-document.getElementById('btn-reset-presets').addEventListener('click',()=>{const preset=generatePresetTabs(APP.COL_COUNT,APP.customMaster);for(let t=18;t<=30;t++){APP.tabs[t]=preset.tabs[t]||[];APP.tabNames[t]=preset.names[t];}renderTabs();if(APP.currentTab>=18)renderGrid();showToast('プリセット初期化完了','success');});
+document.getElementById('btn-regen-bandai').addEventListener('click',()=>{const preset=generatePresetTabs(APP.COL_COUNT,APP.customMaster);for(let t=16;t<=30;t++){APP.tabs[t]=preset.tabs[t]||[];APP.tabNames[t]=preset.names[t];}renderTabs();if(APP.currentTab>=16)renderGrid();showToast('番台タブ再生成完了','success');});
+document.getElementById('btn-reset-presets').addEventListener('click',()=>{const preset=generatePresetTabs(APP.COL_COUNT,APP.customMaster);for(let t=16;t<=30;t++){APP.tabs[t]=preset.tabs[t]||[];APP.tabNames[t]=preset.names[t];}renderTabs();if(APP.currentTab>=16)renderGrid();showToast('プリセット初期化完了','success');});
 function updateMasterCountDisplay(){const el=document.getElementById('master-count-display');if(el)el.textContent='現在のマスタ: '+Object.keys(getMaster()).length+'銘柄';}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay:not(.hidden)').forEach(m=>m.classList.add('hidden'));});
 console.log('v5 loaded — '+Object.keys(STOCK_MASTER).length+' stocks');
+
+// === ダッシュボード ===
+document.getElementById('btn-dashboard').addEventListener('click',()=>{
+  const grid=document.getElementById('dashboard-grid');
+  grid.innerHTML='';
+  for(let t=1;t<=30;t++){
+    const btn=document.createElement('div');
+    const name=APP.tabNames[t]||'タブ'+t;
+    const cnt=(APP.tabs[t]||[]).filter(r=>r.type!=='section').length;
+    btn.style.cssText='padding:8px 12px;background:var(--bg-card);border:1px solid var(--border);border-radius:4px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all 0.15s;';
+    btn.innerHTML='<span style="color:var(--text-bright);font-size:13px;">'+name+'</span><span style="color:var(--text-dim);font-size:11px;">'+cnt+'銘柄</span>';
+    btn.addEventListener('mouseenter',()=>{btn.style.borderColor='var(--accent)';btn.style.background='var(--bg-hover)';});
+    btn.addEventListener('mouseleave',()=>{btn.style.borderColor='var(--border)';btn.style.background='var(--bg-card)';});
+    btn.addEventListener('click',()=>{switchTab(t);document.getElementById('dashboard-modal').classList.add('hidden');});
+    grid.appendChild(btn);
+  }
+  document.getElementById('dashboard-modal').classList.remove('hidden');
+});
+
+// === CSV取り込み（タブ1-15） ===
+document.getElementById('btn-csv-import').addEventListener('click',()=>{
+  if(APP.currentTab>15){showToast('CSV取り込みはタブ1〜15のみ対応です','error');return;}
+  document.getElementById('csv-tab-upload-status').innerHTML='';
+  document.getElementById('csv-import-modal').classList.remove('hidden');
+});
+
+const csvTA=document.getElementById('csv-tab-upload-area'),csvTI=document.getElementById('csv-tab-file-input');
+csvTA.addEventListener('click',()=>csvTI.click());
+csvTA.addEventListener('dragover',e=>{e.preventDefault();csvTA.classList.add('drag-active');});
+csvTA.addEventListener('dragleave',()=>csvTA.classList.remove('drag-active'));
+csvTA.addEventListener('drop',e=>{e.preventDefault();csvTA.classList.remove('drag-active');if(e.dataTransfer.files.length)processCsvTab(e.dataTransfer.files[0]);});
+csvTI.addEventListener('change',()=>{if(csvTI.files.length)processCsvTab(csvTI.files[0]);csvTI.value='';});
+
+function processCsvTab(file){
+  const st=document.getElementById('csv-tab-upload-status');
+  const tabId=APP.currentTab;
+  if(tabId>15){st.innerHTML='<div class="status-msg error">❌ タブ1〜15のみ対応</div>';return;}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const text=e.target.result;
+    const lines=text.split(/[\r\n]+/).map(s=>s.trim()).filter(s=>s&&!s.startsWith('#'));
+    const codes=lines.filter(c=>/^[\dA-Za-z]{3,5}$/.test(c)).map(c=>c.toUpperCase());
+    if(!codes.length){st.innerHTML='<div class="status-msg error">❌ 有効な銘柄コードが見つかりません</div>';return;}
+
+    // セクション名 = ファイル名（拡張子除く）
+    const sectionName=file.name.replace(/\.[^.]+$/,'');
+    const tabData=APP.tabs[tabId]||[];
+    const existingCount=tabData.filter(r=>r.type!=='section').length;
+    const MAX=300;
+    const remaining=MAX-existingCount;
+    if(remaining<=0){st.innerHTML='<div class="status-msg error">❌ このタブは既に300銘柄に達しています</div>';return;}
+
+    const toAdd=codes.slice(0,remaining);
+    const cols=splitToColumns(tabData,APP.COL_COUNT);
+
+    // 空きがある列を探して順に追加
+    // まず既存データの末尾位置を把握
+    let totalAdded=0;
+    const perCol=50; // 1列最大50
+
+    // セクションヘッダを全列に追加
+    for(let c=0;c<APP.COL_COUNT;c++){
+      cols[c].push({type:'section',label:sectionName,_col:c});
+    }
+
+    // 銘柄を列1→2→3→4→5→6の順に追加
+    for(const code of toAdd){
+      // 各列の銘柄数を数えて一番少ない列に入れる（左から優先）
+      let targetCol=0;
+      let minCount=Infinity;
+      for(let c=0;c<APP.COL_COUNT;c++){
+        const stockCount=cols[c].filter(r=>r.type!=='section').length;
+        if(stockCount<minCount){minCount=stockCount;targetCol=c;}
+      }
+      // 1列50超えたら次の列
+      if(minCount>=perCol){
+        // 全列50超え→追加不可
+        break;
+      }
+      cols[targetCol].push({code:code,name:resolveName(code),_col:targetCol});
+      totalAdded++;
+    }
+
+    APP.tabs[tabId]=flattenColumns(cols);
+    saveTabData(tabId);
+    renderGrid();renderTabs();updateStockCount();
+
+    const skipped=codes.length-totalAdded;
+    let msg='✅ '+totalAdded+'銘柄を取り込みました（セクション: '+sectionName+'）';
+    if(skipped>0)msg+=' ※'+skipped+'銘柄は上限超過のため取り込まれませんでした';
+    st.innerHTML='<div class="status-msg success">'+msg+'</div>';
+    showToast(totalAdded+'銘柄取り込み完了','success');
+  };
+  reader.readAsText(file,'UTF-8');
+}

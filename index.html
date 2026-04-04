@@ -26,6 +26,8 @@
         <span class="app-title">📊 マイ銘柄ソートリスト</span>
       </div>
       <div class="right-section">
+        <button class="btn" id="btn-dashboard" title="ダッシュボード">📊 ダッシュボード</button>
+        <button class="btn" id="btn-csv-import" title="CSV取り込み（タブ1-15）">📥 CSV取込</button>
         <button class="btn" id="btn-export-codes" title="チェック済みコード出力">📋 コード出力</button>
         <button class="btn" id="btn-move-up" title="選択銘柄を上へ">↑</button>
         <button class="btn" id="btn-move-down" title="選択銘柄を下へ">↓</button>
@@ -179,6 +181,41 @@
         <button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('export-textarea').value);showToast('コピーしました','success')">📋 コピー</button>
         <button class="btn" onclick="document.getElementById('export-modal').classList.add('hidden')">閉じる</button>
       </div>
+    </div>
+  </div>
+
+  
+  <!-- ダッシュボードモーダル -->
+  <div id="dashboard-modal" class="modal-overlay hidden">
+    <div class="modal" style="max-width:700px;">
+      <button class="close-btn" onclick="document.getElementById('dashboard-modal').classList.add('hidden')">&times;</button>
+      <h2>📊 ダッシュボード</h2>
+      <div id="dashboard-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;"></div>
+    </div>
+  </div>
+
+  <!-- CSV取り込みモーダル -->
+  <div id="csv-import-modal" class="modal-overlay hidden">
+    <div class="modal" style="max-width:500px;">
+      <button class="close-btn" onclick="document.getElementById('csv-import-modal').classList.add('hidden')">&times;</button>
+      <h2>📥 CSV銘柄取り込み</h2>
+      <p style="font-size:13px;color:var(--text);margin-bottom:8px;">
+        現在のタブ（タブ1〜15のみ）に銘柄を一括取り込みます。<br>
+        CSVファイルの<b>ファイル名がセクション名</b>として登録されます。
+      </p>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:10px;margin:8px 0;font-size:12px;color:var(--text-dim);">
+        <b>CSVファイル形式（1列1コード）:</b><br>
+        <code style="color:var(--accent);">7203<br>6758<br>9984<br>130A</code><br><br>
+        ※ 1行に銘柄コードを1つずつ記載してください<br>
+        ※ 列1→列2→…→列6の順に埋まります（最大300銘柄）<br>
+        ※ 300を超えた分は取り込まれません<br>
+        ※ 既存銘柄の後に追加されます
+      </div>
+      <div class="file-upload-area" id="csv-tab-upload-area">
+        <p>📁 CSVファイルをドラッグ＆ドロップ<br>またはクリック</p>
+        <input type="file" id="csv-tab-file-input" accept=".csv,.txt">
+      </div>
+      <div id="csv-tab-upload-status"></div>
     </div>
   </div>
 
