@@ -238,3 +238,107 @@ html, body {
 @media (max-width: 1400px) { :root { --col-count: 5; } }
 @media (max-width: 1100px) { :root { --col-count: 4; } }
 @media (max-width: 800px) { :root { --col-count: 3; } }
+
+/* ============================================================
+   銘柄詳細メモモーダル（機能N）
+   ============================================================ */
+.memo-head {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 10px 14px; margin-bottom: 14px;
+  background: var(--bg-card); border: 1px solid var(--accent-dim);
+  border-radius: 4px;
+}
+.memo-code {
+  font-family: var(--font-mono); font-weight: 700;
+  font-size: var(--font-size-lg); color: var(--accent);
+}
+.memo-name {
+  font-size: var(--font-size-base); color: var(--text-bright);
+  flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.memo-row-inline { display: flex; gap: 10px; margin-bottom: 12px; }
+
+.memo-field {
+  display: flex; flex-direction: column; gap: 4px;
+  margin-bottom: 12px;
+}
+.memo-field label {
+  font-size: 11px; color: var(--text-dim);
+  letter-spacing: 0.04em; text-transform: uppercase;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.memo-field label .char-count {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--text-dim); text-transform: none; letter-spacing: 0;
+}
+.memo-field label .char-count.over { color: var(--danger); }
+.memo-field input[type="text"],
+.memo-field input[type="number"],
+.memo-field select {
+  width: 100%; padding: 6px 8px;
+  background: var(--bg-input); color: var(--text-bright);
+  border: 1px solid var(--border); border-radius: 3px;
+  font-size: var(--font-size-sm); font-family: var(--font-main);
+}
+.memo-field input[type="number"] { font-family: var(--font-mono); }
+.memo-field textarea {
+  width: 100%; padding: 6px 8px; min-height: 52px; resize: vertical;
+  background: var(--bg-input); color: var(--text-bright);
+  border: 1px solid var(--border); border-radius: 3px;
+  font-size: var(--font-size-sm); font-family: var(--font-main); line-height: 1.5;
+}
+.memo-field input:focus,
+.memo-field select:focus,
+.memo-field textarea:focus { outline: none; border-color: var(--accent); }
+
+.theme-input-row { display: flex; gap: 6px; }
+.theme-input-row input { flex: 1; }
+
+.theme-tags {
+  display: flex; flex-wrap: wrap; gap: 5px;
+  min-height: 30px; padding: 5px;
+  background: var(--bg-input); border: 1px solid var(--border);
+  border-radius: 3px; margin-top: 4px;
+}
+.theme-tags:empty::before {
+  content: "テーマ未登録"; color: var(--text-dim);
+  font-size: 11px; padding: 3px 4px; opacity: 0.7;
+}
+.theme-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 6px 2px 10px;
+  background: var(--bg-card); color: var(--accent);
+  border: 1px solid var(--accent-dim); border-radius: 12px;
+  font-size: 11px; font-weight: 500;
+}
+.theme-tag button {
+  background: transparent; border: none; cursor: pointer;
+  color: var(--text-dim); padding: 0 2px; font-size: 13px;
+  line-height: 1;
+}
+.theme-tag button:hover { color: var(--danger); }
+
+.memo-footer {
+  display: flex; align-items: center; gap: 8px;
+  padding-top: 12px; margin-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+/* 銘柄行のメモ済みマーク */
+.stock-row .memo-mark {
+  color: var(--success); font-size: 8px;
+  flex-shrink: 0; margin-right: 2px; line-height: 1;
+  text-shadow: 0 0 4px var(--success);
+}
+
+/* 銘柄名はクリック可能（メモ編集） */
+.stock-row .stock-name {
+  cursor: pointer;
+}
+.stock-row .stock-name:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+  text-decoration-color: var(--accent-dim);
+  text-underline-offset: 2px;
+}

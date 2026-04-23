@@ -87,34 +87,41 @@
     <div class="modal">
       <button class="close-btn" onclick="document.getElementById('help-modal').classList.add('hidden')">&times;</button>
       <h2>？ ヘルプ</h2>
-      <h3>基本操作</h3>
+
+      <h3>■ タブ構成</h3>
       <ul>
-        <li><b>タブ1-17:</b> 自由に銘柄を管理（各列50行×6列=300銘柄）</li>
-        <li><b>タブ18:</b> JPX150構成銘柄（プリセット）</li>
-        <li><b>タブ19:</b> JPX400構成銘柄（プリセット）</li>
-        <li><b>タブ20:</b> 日経225＋TOPIX100（重複除外、プリセット）</li>
-        <li><b>タブ21-29:</b> 1000〜9000番台（全銘柄、昇順）</li>
-        <li><b>タブ30:</b> 3桁＋Aコード</li>
+        <li><b>タブ1〜17:</b> 自由に銘柄を管理（各列50行×6列=300銘柄）。初期は白紙。</li>
+        <li><b>タブ18:</b> JPX150 ＋ グロース250（セクション分け、プリセット）</li>
+        <li><b>タブ19:</b> JPX400（プリセット）</li>
+        <li><b>タブ20:</b> 日経225 ＋ TOPIX100（重複除外、セクション分け、プリセット）</li>
+        <li><b>タブ21〜29:</b> 1000〜9000番台（昇順、Aコード除外、最大1000銘柄）</li>
+        <li><b>タブ30:</b> 3桁＋Aコードのみ集約</li>
       </ul>
-      <h3>銘柄操作</h3>
+
+      <h3>■ 銘柄操作</h3>
       <ul>
         <li><b>追加:</b> ツールバーでコード入力→追加。入力列を選択可能。</li>
         <li><b>コード直接編集:</b> コード部分をクリック。</li>
+        <li><b>メモ閲覧／編集:</b> <b>銘柄名をクリック</b>で詳細メモ（株価／業種／テーマ／監視理由／備考）を編集。</li>
+        <li><b>メモ済みマーク:</b> メモが保存されている銘柄には ● が表示される。同じコードならタブ横断で共通表示。</li>
         <li><b>ドラッグ＆ドロップ:</b> 銘柄・セクションを列間で自由に移動。</li>
         <li><b>↑↓ボタン:</b> チェック済み銘柄を上下移動。</li>
         <li><b>チェックボックス:</b> 列ヘッダの全選択、コード出力、選択削除に対応。</li>
         <li><b>重複表示:</b> 同タブ内の重複銘柄はピンク色で表示。</li>
       </ul>
-      <h3>管理画面</h3>
+
+      <h3>■ 管理画面</h3>
       <ul>
-        <li><b>JPXマスタ:</b> data_j.xlsアップロードで全銘柄更新。</li>
-        <li><b>番台再生成:</b> マスタから21-30タブを再生成。</li>
+        <li><b>JPXマスタ:</b> <code>data_j.xls</code> アップロードで全銘柄（約4,100件）を更新。</li>
+        <li><b>指数構成CSV:</b> 各指数（日経225/TOPIX100/JPX150/JPX400）の構成銘柄CSVをアップロード。</li>
+        <li><b>番台再生成:</b> マスタからタブ18-30を再生成。</li>
         <li><b>プリセット初期化:</b> タブ18-20を初期データに戻す。</li>
       </ul>
-      <h3>データ保存</h3>
+
+      <h3>■ データ保存</h3>
       <ul>
-        <li>データはブラウザ(localStorage)に自動保存されます。</li>
-        <li>Googleログイン中はFirestoreにも同期されます。</li>
+        <li>GoogleログインでFirestoreに自動保存・同期されます（Chrome ⇔ Brave 等のブラウザ間も同期）。</li>
+        <li>銘柄メモは <code>users/&#123;uid&#125;/stockMemos/&#123;CODE&#125;</code> に保存されます。</li>
       </ul>
     </div>
   </div>
@@ -167,6 +174,58 @@
         <h3>🏗 プリセットタブ初期化</h3>
         <p style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">タブ18-20を初期データに戻します。</p>
         <button class="btn" id="btn-reset-presets">プリセットを初期化</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 銘柄詳細メモモーダル（機能N） -->
+  <div id="memo-modal" class="modal-overlay hidden">
+    <div class="modal" style="max-width:520px;">
+      <button class="close-btn" onclick="document.getElementById('memo-modal').classList.add('hidden')">&times;</button>
+      <h2>📝 銘柄メモ</h2>
+
+      <div class="memo-head">
+        <span class="memo-code" id="memo-code"></span>
+        <span class="memo-name" id="memo-name"></span>
+      </div>
+
+      <div class="memo-row-inline">
+        <div class="memo-field" style="flex:0 0 140px;">
+          <label>株価（現在）</label>
+          <input type="number" id="memo-price" step="0.01" placeholder="---" />
+        </div>
+        <div class="memo-field" style="flex:1;">
+          <label>業種</label>
+          <select id="memo-industry">
+            <option value="">（未選択）</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="memo-field">
+        <label>テーマ（Enterまたは＋で追加）</label>
+        <div class="theme-input-row">
+          <input type="text" id="memo-theme-input" placeholder="例: 半導体、AI、防衛" />
+          <button class="btn btn-small btn-accent" id="memo-theme-add">＋</button>
+        </div>
+        <div class="theme-tags" id="memo-theme-tags"></div>
+      </div>
+
+      <div class="memo-field">
+        <label>監視理由／気になった理由 <span class="char-count" id="memo-reason-count">0 / 100</span></label>
+        <textarea id="memo-reason" maxlength="100" placeholder="（最大100文字）"></textarea>
+      </div>
+
+      <div class="memo-field">
+        <label>備考 <span class="char-count" id="memo-note-count">0 / 100</span></label>
+        <textarea id="memo-note" maxlength="100" placeholder="（最大100文字）"></textarea>
+      </div>
+
+      <div class="memo-footer">
+        <button class="btn btn-danger" id="memo-delete">メモ削除</button>
+        <div style="flex:1;"></div>
+        <button class="btn" onclick="document.getElementById('memo-modal').classList.add('hidden')">キャンセル</button>
+        <button class="btn btn-accent" id="memo-save">保存</button>
       </div>
     </div>
   </div>

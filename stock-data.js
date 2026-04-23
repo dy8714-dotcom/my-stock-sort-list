@@ -4499,31 +4499,33 @@ function generatePresetTabs(colCount, customMaster) {
   const tabs = {};
   const names = {};
 
-  // タブ16: グロース250
-  tabs[16] = _buildSections([{ label: "グロース250", codes: INDEX_GROWTH250 }], master, colCount);
-  names[16] = "グロース250";
-
-  // タブ17: TOPIX100
-  tabs[17] = _buildSections([{ label: "TOPIX100", codes: INDEX_TOPIX100 }], master, colCount);
-  names[17] = "TOPIX100";
-
-  // タブ18: JPX150
-  tabs[18] = _buildSections([{ label: "JPX150", codes: INDEX_JPX150 }], master, colCount);
-  names[18] = "JPX150";
+  // タブ18: JPX150 ＋ グロース250（セクション分け）
+  tabs[18] = _buildSections([
+    { label: "JPX150",     codes: INDEX_JPX150 },
+    { label: "グロース250", codes: INDEX_GROWTH250 }
+  ], master, colCount);
+  names[18] = "JPX150＆グロース250";
 
   // タブ19: JPX400
   tabs[19] = _buildSections([{ label: "JPX400", codes: INDEX_JPX400 }], master, colCount);
   names[19] = "JPX400";
 
-  // タブ20: 日経225
-  tabs[20] = _buildSections([{ label: "日経225", codes: INDEX_NIKKEI225 }], master, colCount);
-  names[20] = "日経225";
+  // タブ20: 日経225 ＋ TOPIX100（重複除外）
+  const nkSet = new Set(INDEX_NIKKEI225);
+  const topixUniq = INDEX_TOPIX100.filter(c => !nkSet.has(c));
+  tabs[20] = _buildSections([
+    { label: "日経225",  codes: INDEX_NIKKEI225 },
+    { label: "TOPIX100", codes: topixUniq }
+  ], master, colCount);
+  names[20] = "日経225＆TOPIX100";
 
+  // タブ21〜29: 各番台（Aコード除外、昇順）
   const bandai = getStocksByBandai(master);
   for (let b = 1; b <= 9; b++) {
     tabs[20 + b] = _assignCols(bandai[b].map(s => ({ code: s.code, name: s.name })), colCount);
     names[20 + b] = b + "000番台";
   }
+  // タブ30: 3桁＋Aコード
   tabs[30] = _assignCols(bandai["special"].map(s => ({ code: s.code, name: s.name })), colCount);
   names[30] = "3桁＋Aコード";
 
